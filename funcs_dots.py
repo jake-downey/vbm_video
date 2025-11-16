@@ -33,10 +33,92 @@ def parametric_square(center, v1, v2,edge_length):
     )
     return square_surface
 
+def _ico_base():
+    phi = (1 + 5**0.5) / 2
+    V = np.array([
+        [-1,  phi,  0], [ 1,  phi,  0], [-1, -phi,  0], [ 1, -phi,  0],
+        [ 0, -1,  phi], [ 0,  1,  phi], [ 0, -1, -phi], [ 0,  1, -phi],
+        [ phi,  0, -1], [ phi,  0,  1], [-phi,  0, -1], [-phi,  0,  1],
+    ], dtype=float)
+    V /= np.linalg.norm(V, axis=1, keepdims=True)
+    F = [
+        (0,11,5),(0,5,1),(0,1,7),(0,7,10),(0,10,11),
+        (1,5,9),(5,11,4),(11,10,2),(10,7,6),(7,1,8),
+        (3,9,4),(3,4,2),(3,2,6),(3,6,8),(3,8,9),
+        (4,9,5),(2,4,11),(6,2,10),(8,6,7),(9,8,1)
+    ]
+    return [v.copy() for v in V], list(F)
+
+def _mid_idx(i, j, verts, cache):
+    k = (i, j) if i < j else (j, i)
+    if k in cache: return cache[k]
+    m = (verts[i] + verts[j]) * 0.5
+    m /= np.linalg.norm(m)
+    verts.append(m)
+    idx = len(verts) - 1
+    cache[k] = idx
+    return idx
+
+def _subdivide(verts, faces, levels):
+    for _ in range(int(levels)):
+        cache, newF = {}, []
+        for a,b,c in faces:
+            ab = _mid_idx(a,b,verts,cache)
+            bc = _mid_idx(b,c,verts,cache)
+            ca = _mid_idx(c,a,verts,cache)
+            newF += [(a,ab,ca),(b,bc,ab),(c,ca,bc),(ab,bc,ca)]
+        faces = newF
+    return faces
+
+# --- One parametric triangular patch on the sphere ---
+def _tri_patch_surface(v1, v2, v3, center, r, color, opacity, stroke_opacity, res, depth_test):
+    v1 = v1/np.linalg.norm(v1); v2 = v2/np.linalg.norm(v2); v3 = v3/np.linalg.norm(v3)
+    eps = 1e-3  # trim edges to avoid degenerate jacobians
+    def f(u, v):
+        # Map square → triangle: s=u, t=v*(1-u), w1=1-s-t
+        s = u
+        t = v*(1.0 - u)
+        w1 = 1.0 - s - t
+        p = w1*v1 + s*v2 + t*v3
+        p /= np.linalg.norm(p)
+        return center + r*p
+    surf = ParametricSurface(
+        f, u_range=(eps, 1.0 - eps), v_range=(eps, 1.0 - eps),
+        resolution=(res, res),
+    ).set_color(color).set_opacity(opacity)
+    if hasattr(surf, "set_stroke"): surf.set_stroke(color, stroke_opacity)
+    if depth_test and hasattr(surf, "apply_depth_test"): surf.apply_depth_test()
+    return surf
+
+# --- Public: Icosphere built from ParametricSurface faces ---
+def IcoDotSurface(center=(0,0,0), r=0.06, color="#AAAAAA",
+                  opacity=1.0, stroke_opacity=0.0,
+                  subdivisions=1, face_resolution=6, depth_test=True):
+    """
+    Minimal icosphere made of ParametricSurface triangle patches.
+    - subdivisions: 0→20 faces, 1→80, 2→320, 3→1280, ...
+    - face_resolution: grid per triangle (6–10 is plenty for small dots)
+    """
+    center = np.array(center, dtype=float)
+    verts, faces = _ico_base()
+    faces = _subdivide(verts, faces, subdivisions)
+    # scale & translate verts once
+    verts = [center + r*v for v in verts]
+
+    g = Group()
+    for a,b,c in faces:
+        tri = _tri_patch_surface(
+            verts[a] - center, verts[b] - center, verts[c] - center,
+            center, r, color, opacity, stroke_opacity, face_resolution, depth_test
+        )
+        g.add(tri)
+    return g
+
 
 def dot_plane_pos(num_rows, num_cols, offset_value, plane):
     dot_group = Group()
-    sphere = Sphere(radius=sphere_size)
+    r = sphere_size
+    sphere = Sphere(radius = sphere_size, resolution = (30,30))
     col = [GREEN, RED, BLUE]
     if plane == "xy":
         for i in range (-num_cols+1, num_cols):
@@ -63,7 +145,8 @@ def dot_plane_pos(num_rows, num_cols, offset_value, plane):
 
 def dot_plane_neg(num_rows, num_cols, offset_value, plane):
     dot_group = Group()
-    sphere = Sphere(radius=sphere_size)
+    r = sphere_size
+    sphere = Sphere(radius = sphere_size, resolution = (30,30))
     if plane == "xy":
         for i in range (-num_cols+1, num_cols-1):
             for j in range(-num_rows+1, num_rows-1):
@@ -196,13 +279,13 @@ def make_box_grid(num_dots,stroke):
 
 def doubling_curve_xyz(num_dots, offset_value, plane):
     curve_group = Group()
-    col = [GREEN, RED, BLUE]
+    col = [RED, BLUE, GREEN]
     if plane == "xy":
         for i in range (-num_dots, (num_dots)+1):
             curve = Line(
                 [i, num_dots, offset_value],
                 [num_dots, i, offset_value],
-                color=col[(i+offset_value)%3]
+                color=col[(i+1+offset_value)%3]
             )
             curve_group.add(curve)
             curve2 = Line(
@@ -216,7 +299,7 @@ def doubling_curve_xyz(num_dots, offset_value, plane):
             curve = Line(
                 [i, offset_value, num_dots],
                 [num_dots, offset_value, i],
-                color=col[(i+offset_value)%3]
+                color=col[(i+1+offset_value)%3]
             )
             curve_group.add(curve)
             curve2 = Line(
@@ -228,15 +311,15 @@ def doubling_curve_xyz(num_dots, offset_value, plane):
     if plane == "yz":
         for i in range (-num_dots, (num_dots)+1):
             curve = Line(
-                [x_value, i, num_dots],
-                [x_value, num_dots, i],
-                color=col[(i+x_value)%3]
+                [offset_value, i, num_dots],
+                [offset_value, num_dots, i],
+                color=col[(i+1+offset_value)%3]
             )
             curve_group.add(curve)
             curve2 = Line(
-                [x_value, i, -num_dots],
-                [x_value, -num_dots, i],
-                color=col[(i+x_value)%3]
+                [offset_value, i, -num_dots],
+                [offset_value, -num_dots, i],
+                color=col[(i+offset_value)%3]
             )
             curve_group.add(curve2)
     return curve_group

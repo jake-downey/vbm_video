@@ -222,6 +222,92 @@ class FromInfinityCylinder(Scene):
         self.play(off_tracker.animate.set_value(0), run_time = 10)
         self.wait(3)
 
+class CircleCylinderInfinity(Scene):
+    def construct(self):
+        frame = self.camera.frame
+        frame.set_euler_angles(
+            theta=30*DEGREES,
+            phi=60*DEGREES,
+        )
+        # frame.add_updater(lambda m, dt: m.increment_theta(-0.1*dt))
+        axes = ThreeDAxes().apply_depth_test()
+        self.add(axes)
+
+        off_tracker = ValueTracker(0)
+
+        def parametric_circle(offset, color):
+            r = np.sqrt(offset**2 + 1)
+            cylinder = ParametricCurve(
+                lambda u: np.array([
+                    -r*np.cos(u)+offset,
+                    0,
+                    r*np.sin(u),
+                ]),
+                t_range = (0, TAU, 0.01),
+                color = color,
+            )
+            return cylinder
+        mid_line = Line(
+            np.array([off_tracker.get_value(),-4,0]),
+            np.array([off_tracker.get_value(),4,0]),
+        ).set_color(YELLOW).apply_depth_test()
+
+        
+       
+        zero_cyl = parametric_circle(off_tracker.get_value(),RED)
+        zero_cyl.add_updater(lambda m: m.become(parametric_circle(off_tracker.get_value(),RED)))
+        mid_line.add_updater(lambda m: m.become(
+            Line(
+                np.array([off_tracker.get_value(),-4,0]),
+                np.array([off_tracker.get_value(),4,0]),
+            ).set_color(YELLOW).apply_depth_test()
+        ))
+
+
+        def long_line_through(p1, p2, length=None, **style):
+            p1 = np.array(p1, dtype=float)
+            p2 = np.array(p2, dtype=float)
+            v = p2 - p1
+            n = np.linalg.norm(v)
+            if n == 0:
+                raise ValueError("p1 and p2 must be distinct")
+            u = v / n
+            mid = 0.5 * (p1 + p2)
+
+            L = float(length) if length is not None else 1.15 * 1000
+            a = mid - u * (L / 2.0)
+            b = mid + u * (L / 2.0)
+            return Line(a, b, **style)
+
+        line_1 = long_line_through(
+            zero_cyl.get_center(),
+            np.array([0,0,1]),
+        ).set_color(WHITE).apply_depth_test()
+        line_1.add_updater(lambda m: m.become(
+                long_line_through(
+                zero_cyl.get_center(),
+                np.array([0,0,1]),
+            ).set_color(WHITE).apply_depth_test()
+        ))
+
+        line_2 = long_line_through(
+            zero_cyl.get_center(),
+            np.array([0,0,1]),
+        ).set_color(WHITE).apply_depth_test()
+        line_2.add_updater(lambda m: m.become(
+                long_line_through(
+                zero_cyl.get_center(),
+                np.array([0,0,-1]),
+            ).set_color(WHITE).apply_depth_test()
+        ))
+
+
+        self.add(zero_cyl, mid_line, line_1, line_2)
+        self.wait()
+        self.play(off_tracker.animate.set_value(-500), run_time = 10)
+        self.wait()
+        self.play(off_tracker.animate.set_value(0), run_time = 10)
+        self.wait(3)
 
 class FromInfinitySphere(Scene):
     def construct(self):

@@ -18,7 +18,7 @@ class Torus(Scene):
         def hopf_verts_pos(e1_step,e2_step,eta_step,plane):
 
             dot_group = Group()
-            sphere = Sphere(radius=sphere_size)
+            sphere = Sphere(radius=sphere_size, resolution = (30,30))
             colors = [BLUE, GREEN, RED]
             if plane == "xy":
                 for i in range (0, e1_step):
@@ -43,7 +43,7 @@ class Torus(Scene):
 
         def hopf_verts_neg(e1_step,e2_step,eta_step):
             dot_group = Group()
-            sphere = Sphere(radius=sphere_size)
+            sphere = Sphere(radius=sphere_size, resolution = (30,30))
             for i in range (0, e1_step):
                 for j in range(0, e2_step):
                     e1 = (i/e1_step) * 2 * math.pi - (((1/e1_step) * 2 * math.pi)/2)
@@ -177,7 +177,7 @@ class Torus(Scene):
         def hopf_points_xy(e1_step,e2_step, eta_step, polarity):
             dot_group = Group()
             colors = [BLUE,GREEN,RED]
-            new_sphere = Sphere(radius=sphere_size)
+            new_sphere = Sphere(radius=sphere_size, resolution = (10,10))
             if polarity == "pos":
                 for i in range (0, e1_step):
                     for j in range (0, e2_step):
@@ -287,7 +287,6 @@ class Torus(Scene):
                 v_range = (0, TAU),
                 color = col,
             )
-            xy_surface.set_opacity(surface_opacity)
             xy_surface.apply_depth_test()
             return xy_surface
 
@@ -337,7 +336,7 @@ class Torus(Scene):
         
         # TRACKERS
         
-        eta_step_tracker = ValueTracker(PI/3)
+        eta_step_tracker = ValueTracker(PI/4)
         eta_length = ValueTracker(PI/2)
         e1_length = ValueTracker(0)
         e2_length = ValueTracker(0) 
@@ -361,7 +360,7 @@ class Torus(Scene):
         hypers_neg = hopf_hypers(PI/3, 18, BLUE, "neg")
         curves = hopf_curves(36, eta_step_tracker.get_value())
 
-        xy = surface_xy(eta_step_tracker.get_value(), GREEN)
+        xy = surface_xy(eta_step_tracker.get_value(), WHITE)
         xz = surface_xz(PI/3, RED)
         yz = surface_yz(PI/3, GREEN)
         surface_doubling = doubling_surface(eta_step_tracker.get_value(), RED)
@@ -432,8 +431,9 @@ class Torus(Scene):
         # self.wait()
         # self.add(hopf_points_pos)
         # self.add(hopf_points_neg)
-        # self.add(xy_points_pos)
-        # self.add(xy_points_neg)
+        self.add(xy_points_pos)
+        self.add(xy_points_neg)
+        # self.add(curves)
         # self.add(yz_points_pos)
         # self.add(yz_points_neg)
         # self.add(xz_points_pos)
@@ -444,11 +444,12 @@ class Torus(Scene):
         # self.add(longitudes_pos)
         # self.add(longitudes_neg)
 
-        self.add(xy)
-        self.add(xz)
-        self.add(yz)
+        # self.add(xy)
+        # self.add(xz)
+        # self.add(yz)
         # # self.add(surface_doubling)
         # self.play(eta_step_tracker.animate.set_value(-PI), rate_func=linear, run_time = 10)
         # self.play(eta_step_tracker.animate.set_value(PI), run_time = 10)
 
         # self.wait(3)
+

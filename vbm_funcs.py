@@ -380,6 +380,7 @@ def symbol_polarities_pos(nums_function, font_scale):
             polarity_group.add(polarity)
         counter = (counter + 1) % 9
     return polarity_group
+
 def symbol_polarities_neg(nums_function,font_scale):
     polarity_group = Group()
     counter = 0

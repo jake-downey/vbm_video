@@ -1,6 +1,6 @@
 from manimlib import *
-import sys
-sys.path.append("C:/Users/thund/Downloads/manim-master/manimprojects")
+import os, sys
+sys.path.insert(0, os.path.dirname(__file__))   # ensures the script's folder is on sys.path
 from vbm_funcs import *
 from diamond_funcs import *
 
@@ -11,47 +11,67 @@ class TitleScreen(Scene):
     def construct(self):
         frame = self.camera.frame
         symbol = vbm_symbol().scale(2)
-        numbers = vbm_numbers(1,9,1.4,2.6)
+        numbers = vbm_numbers(1,9,1.4,2.6).set_color(WHITE)
         circle = Circle().scale(2).set_color(WHITE)
         dots = vbm_dots(1,9,1,2)
         vbm_group = Group(symbol, numbers, circle, dots).shift(DOWN*0.5)
         title = Tex(r"\textsc{Vortex Based Mathmatics}").scale(1.5)
         chapter = Tex(r"\textsc{Chapter 1: VBM and Modular Arithmetic}").next_to(title, DOWN, buff = 0.5).shift(UP*0.3)
         self.add(title)
-        self.wait()
+        self.wait(2)
         self.play(
             title.animate.shift(UP*0.3),
             FadeIn(chapter),
         )
-        self.wait()
+        self.wait(2)
         self.play(
             FadeOut(chapter),
         )
         self.play(
             title.animate.shift(UP*3),
         )
-        self.wait()
+        self.wait(2)
         self.play(
             ShowCreation(symbol[0]),
         )
-        self.wait()
+        self.wait(2)
         for num in numbers:
             self.play(
                 Write(num),
                 run_time = 0.4
             )
-        self.wait()
+        self.wait(2)
         self.play(
             ShowCreation(symbol[2]),
         )
+        self.wait(2)
         self.play(
             ShowCreation(symbol[1]),
         )
+        self.wait(2)
         self.play(
             ShowCreation(symbol[3]),
             ShowCreation(symbol[4]),
         )
+        
+        numbers_new = vbm_numbers(1,9,1.4,2.6).shift(DOWN*0.5)
+        self.wait(2)
+        self.play(FadeIn(numbers_new))
 
+        plus_group = Group()
+        minus_group = Group()
+        for i in numbers_new:
+            plus = Tex(r"+").scale(0.5).next_to(i, LEFT, buff = 0.1)
+            minus = Tex(r"-").scale(0.5).next_to(i, RIGHT, buff = 0.1)
+            plus_group.add(plus)
+            minus_group.add(minus)
+
+        self.wait(2)
+        self.play(
+            FadeIn(plus_group),
+            FadeIn(minus_group),
+        )
+            
         rad = 2.4
         stroke = 1
         circle_emination = Circle().set_stroke(width=5)
@@ -85,9 +105,9 @@ class TitleScreen(Scene):
             arrow1, arrow2, arrow3, arrow4, arrow5, arrow6
         ).set_color(YELLOW).scale(0.25).shift(DOWN*1.2)
 
-        self.wait()
+        self.wait(2)
         self.play(FadeIn(center_emination))
-        self.wait()
+        self.wait(2)
 
         hexagon = RegularPolygon(n=6).scale(0.42).set_color(GREEN)
         triangle_up = RegularPolygon(n=3).scale(0.5).set_color(GREEN)
@@ -105,12 +125,12 @@ class TitleScreen(Scene):
         self.play(
             FadeIn(shapes)
         )
-
+        self.wait(2)
         self.play(
             frame.animate.scale(0.001).shift(DOWN*1.2),
             run_time = 5
         )
-        self.wait()
+        self.wait(2)
 
 class SymbolBreakdown(Scene):
     def construct(self):
@@ -172,6 +192,27 @@ class SymbolBreakdown(Scene):
         adds.arrange(DOWN, buff= 0.3).shift(RIGHT*4.6)
         eighteen = Tex(r"18").scale(0.8).next_to(adds_99[1], DOWN, buff = 0.3)
         adds_mod = Tex(r"1 + 8 = 9").scale(0.8).next_to(adds_99, DOWN, buff = 0.3)
+        
+        self.play(
+            Indicate(numbers[1]),
+            Indicate(numbers[8]),
+        )
+        self.play(
+            Indicate(numbers[2]),
+            Indicate(numbers[7]),
+        )
+        self.play(
+            Indicate(numbers[3]),
+            Indicate(numbers[6]),
+        )
+        self.play(
+            Indicate(numbers[4]),
+            Indicate(numbers[5]),
+        )
+        self.play(
+            Indicate(numbers[0]),
+        )
+        self.wait(2)
 
         self.play(
             ShowCreation(horizontal_1),
@@ -243,6 +284,15 @@ class SymbolBreakdown(Scene):
             return number_group
                
         first_ring = base10_numbers(10, 0.8, 3.2)
+        self.play(Write(first_ring[0]))
+        self.wait()
+        eq_for_10 = Tex(r"1+0=1").next_to(first_ring[0],UR, buff = 0.5)
+        self.play(Write(eq_for_10))
+        self.wait()
+        self.play(FadeOut(eq_for_10))
+        self.wait()
+
+
         for ring in first_ring:
             self.play(Write(ring))
         self.wait()
@@ -298,36 +348,41 @@ class SymbolBreakdown(Scene):
         eisel.move_to(4*RIGHT).set_fill(BLACK).set_opacity(1.0)
         self.play(FadeIn(eisel))
 
+        text_scale = 1.3
+        family_title = Tex(r"\text{Number Colors}").scale(1.5).move_to(eisel).shift(UP*3)
+        plus_three_1 =  Tex(r"+3").scale(0.6).scale(text_scale)
+        plus_three_2 =  Tex(r"+3").scale(0.6).scale(text_scale)
+        plus_three_x =  Tex(r"+3").scale(0.6).scale(text_scale)
+        plus_six_1 =  Tex(r"+6").scale(0.6).scale(text_scale)
+        plus_six_2 =  Tex(r"+6").scale(0.6).scale(text_scale)
+        plus_six_x =  Tex(r"+6").scale(0.6).scale(text_scale)
+        family_1 = Tex(r"1", tex_to_color_map = t2c).scale(text_scale)
+        family_4 = Tex(r"4", tex_to_color_map = t2c).scale(text_scale)
+        family_7 = Tex(r"7", tex_to_color_map = t2c).scale(text_scale)
+        family_147 = Group(family_1, plus_three_1, family_4, plus_three_2, family_7).arrange(RIGHT, buff=0.3*text_scale)
+        
+        plus_three_3 =  Tex(r"+3").scale(0.6).scale(text_scale)
+        plus_three_4 =  Tex(r"+3").scale(0.6).scale(text_scale)
+        family_2 = Tex(r"2", tex_to_color_map = t2c).scale(text_scale)
+        family_5 = Tex(r"5", tex_to_color_map = t2c).scale(text_scale)
+        family_8 = Tex(r"8", tex_to_color_map = t2c).scale(text_scale)
+        family_258 = Group(family_2, plus_three_3, family_5, plus_three_4, family_8).arrange(RIGHT, buff=0.3*text_scale)
+        plus_three_5 =  Tex(r"+3").scale(0.6).scale(text_scale)
+        plus_three_6 =  Tex(r"+3").scale(0.6).scale(text_scale)
+        family_3 = Tex(r"3", tex_to_color_map = t2c).scale(text_scale)
+        family_6 = Tex(r"6", tex_to_color_map = t2c).scale(text_scale)
+        family_9 = Tex(r"9", tex_to_color_map = t2c).scale(text_scale)
+        family_369 = Group(family_3, plus_three_5, family_6, plus_three_6, family_9).arrange(RIGHT, buff=0.3*text_scale)
 
-        family_title = Tex(r"\text{Family Number Groups}").move_to(eisel).shift(UP*3)
-        plus_three_1 =  Tex(r"+3").scale(0.6)
-        plus_three_2 =  Tex(r"+3").scale(0.6)
-        family_1 = Tex(r"1", tex_to_color_map = t2c)
-        family_4 = Tex(r"4", tex_to_color_map = t2c)
-        family_7 = Tex(r"7", tex_to_color_map = t2c)
-        family_147 = Group(family_1, plus_three_1, family_4, plus_three_2, family_7).arrange(RIGHT, buff=0.3)
-        plus_three_3 =  Tex(r"+3").scale(0.6)
-        plus_three_4 =  Tex(r"+3").scale(0.6)
-        family_2 = Tex(r"2", tex_to_color_map = t2c)
-        family_5 = Tex(r"5", tex_to_color_map = t2c)
-        family_8 = Tex(r"8", tex_to_color_map = t2c)
-        family_258 = Group(family_2, plus_three_3, family_5, plus_three_4, family_8).arrange(RIGHT, buff=0.3)
-        plus_three_5 =  Tex(r"+3").scale(0.6)
-        plus_three_6 =  Tex(r"+3").scale(0.6)
-        family_3 = Tex(r"3", tex_to_color_map = t2c)
-        family_6 = Tex(r"6", tex_to_color_map = t2c)
-        family_9 = Tex(r"9", tex_to_color_map = t2c)
-        family_369 = Group(family_3, plus_three_5, family_6, plus_three_6, family_9).arrange(RIGHT, buff=0.3)
+        family_group = Group(family_147, family_258, family_369).arrange(DOWN, buff=0.7*text_scale)
+        family_group.next_to(family_title, DOWN, buff=1.5*text_scale)
 
-        family_group = Group(family_147, family_258, family_369).arrange(DOWN, buff=0.7)
-        family_group.next_to(family_title, DOWN, buff=1.5)
-
-        arrow_3 = Arrow(ORIGIN, RIGHT*3)
-        arrow_3_title = Tex(r"+3").scale(0.6)
-        arr3 = Group(arrow_3, arrow_3_title).arrange(UP, buff=0.1).next_to(family_147, UP, buff=0.4)
-        arrow_6 = Arrow(ORIGIN, LEFT*3)
-        arrow_6_title = Tex(r"+6").scale(0.6)
-        arr6 = Group(arrow_6, arrow_6_title).arrange(DOWN, buff=0.1).next_to(family_147, DOWN, buff=0.4)
+        arrow_3 = Arrow(ORIGIN, RIGHT*3).scale(text_scale)
+        arrow_3_title = Tex(r"+3").scale(0.6).scale(text_scale)
+        arr3 = Group(arrow_3, arrow_3_title).arrange(UP, buff=0.1*text_scale).next_to(family_147, UP, buff=0.4*text_scale)
+        arrow_6 = Arrow(ORIGIN, LEFT*3).scale(text_scale)
+        arrow_6_title = Tex(r"+6").scale(0.6).scale(text_scale)
+        arr6 = Group(arrow_6, arrow_6_title).arrange(DOWN, buff=0.1*text_scale).next_to(family_147, DOWN, buff=0.4*text_scale)
 
         line14 = Line(dots[1], dots[4]).set_color(RED)
         line47 = Line(dots[4], dots[7]).set_color(RED)
@@ -344,54 +399,83 @@ class SymbolBreakdown(Scene):
         line69 = Line(dots[6], dots[0]).set_color(GREEN)
         line93 = Line(dots[0], dots[3]).set_color(GREEN)
         line_369 = Group(line36, line69, line93)
-
+        t2c = {
+            "1":RED, "4":RED, "7":RED,
+            "2":BLUE, "5":BLUE, "8":BLUE,
+            "3":GREEN, "6":GREEN, "0":GREEN,
+        }
+        eq_for_14 = Tex(r"1+3=4", tex_to_color_map = t2c).next_to(family_147,DOWN,buff=2).scale(0.9*text_scale)
+        eq_for_47 = Tex(r"4+3=7", tex_to_color_map = t2c).next_to(family_147,DOWN,buff=2).scale(0.9*text_scale)
+        eq_for_71 = Tex(r"7+3=10=1", tex_to_color_map = t2c).next_to(family_147,DOWN,buff=2).scale(0.9*text_scale)
+        eq_for_71[4].set_color(WHITE)
+        eq_for_71[5].set_color(WHITE)
         self.play(FadeIn(family_title))
         self.wait()
         self.play(FadeIn(family_147[0]))
         self.wait()
         self.play(
             FadeIn(family_147[1]),
-            ShowCreation(line_147[0]),
-        )
-        self.play(
             FadeIn(family_147[2]),
-            FadeOut(family_147[1]),
+            ShowCreation(line_147[0]),
+            Write(eq_for_14),
         )
         self.wait()
+
         self.play(
+            FadeOut(family_147[1]),
             FadeIn(family_147[3]),
-            ShowCreation(line_147[1]),
-        )
-        self.play(
             FadeIn(family_147[4]),
+            ShowCreation(line_147[1]),
+            FadeOut(eq_for_14),
+            Write(eq_for_47),
+        )
+        self.wait()
+
+        plus_three_x.next_to(family_147, RIGHT, buff = 0.3*text_scale)
+        self.play(
             FadeOut(family_147[3]),
+            FadeIn(plus_three_x),
+            ShowCreation(line_147[2]),
+            FadeOut(eq_for_47),
+            Write(eq_for_71),
         )
         self.wait()
         self.play(
             FadeIn(arr3),
-            ShowCreation(line_147[2]),
+            FadeOut(plus_three_x),
         )
         self.wait()
         self.play(
             FadeOut(line_147[0]),
             FadeOut(line_147[1]),
             FadeOut(line_147[2]),
+            FadeOut(eq_for_71),
         )
         self.wait()
+
+        plus_six_1.next_to(family_147, LEFT, buff = 0.3*text_scale)
+        plus_six_2.move_to(family_147[3])
+        plus_six_x.move_to(family_147[1])
         self.play(
             FadeIn(arr6),
+            FadeIn(plus_six_1),
             ShowCreation(line_147[3]),
         )
         self.wait()
         self.play(
+            FadeOut(plus_six_1),
+            FadeIn(plus_six_2),
             ShowCreation(line_147[4]),
         )
         self.wait()
         self.play(
+            FadeOut(plus_six_2),
+            FadeIn(plus_six_x),
             ShowCreation(line_147[5]),
         )
         self.wait()
         self.play(
+            FadeOut(plus_six_x),
             arr6.animate.next_to(family_258, DOWN, buff=0.4)
         )
         self.wait()
@@ -414,6 +498,24 @@ class SymbolBreakdown(Scene):
             FadeIn(line_369),
         )
         self.wait()
+        
+        fng_title = Tex(r"\text{Family Number Groups}").scale(1.1).move_to(family_title)
+        self.play(
+            Uncreate(family_title),
+            Write(fng_title),
+        )
+        self.wait(2)
+        self.play(
+            Transform(line_147, line_258),
+            Transform(line_258, line_147),
+        )
+        self.wait()
+
+        self.play(
+            Indicate(line_369)
+        )
+        self.wait()
+
         self.play(
             FadeOut(family_147[0]),
             FadeOut(family_147[2]),
@@ -429,7 +531,7 @@ class SymbolBreakdown(Scene):
             FadeOut(line_258),
             FadeOut(arr3),
             FadeOut(arr6),
-            FadeOut(family_title),
+            FadeOut(fng_title),
             FadeOut(eisel),
         )
         self.play(
@@ -674,6 +776,11 @@ class SymbolBreakdown(Scene):
             FadeOut(doubling_title),
         )
         self.wait()
+        self.play(
+            Indicate(numbers[0]),
+            Indicate(numbers[3]),
+            Indicate(numbers[6]),
+        )
         vert_9 = DashedLine(circle.get_top(), circle.get_bottom()).set_color(GREEN)
         vert_1 = vert_9.copy().shift([dots[1].get_center()[0],0,0]).set_color(RED)
         vert_2 = vert_9.copy().shift([dots[2].get_center()[0],0,0]).set_color(BLUE)
@@ -857,17 +964,30 @@ class SymbolBreakdown(Scene):
 
         self.wait()
         self.play(
-            half_group.animate.shift(LEFT),
-            backward_group.animate.shift(LEFT*0.7),
-            double_group.animate.next_to(half_group, RIGHT, buff = 0.3),
-            FadeOut(foward_group),
             FadeOut(backward_circuit),
         )
+        self.play(
+            dashed_3.animate.shift(RIGHT*2.5),
+            dashed_6.animate.shift(RIGHT*2.5),
+            vert_9.animate.shift(RIGHT*2.5),
+            vbm_group.animate.shift(RIGHT*2.5),
+            half_group.animate.shift(LEFT*0.3),
+            backward_group.animate.set_color(WHITE).shift(RIGHT*0.3),
+            double_group.animate.next_to(half_group, RIGHT, buff = 1.5),
+            FadeOut(foward_group),
+        )
+        backward_rect = SurroundingRectangle(backward_group).set_color(GREEN)
+        self.play(FadeIn(backward_rect))
         left_arrow = Arrow([0,0,0],[1,0,0]).next_to(half_group[0], LEFT)
         right_arrow = Arrow([0,0,0],[-1,0,0]).next_to(double_group[0], RIGHT)
         self.wait()
         self.play(FadeIn(left_arrow), FadeIn(right_arrow))
         self.wait()
+        indicator_circuit.shift(RIGHT*2.5)
+        backward_circuit.shift(RIGHT*2.5)
+        indicator_3.shift(RIGHT*2.5)
+        indicator_6.shift(RIGHT*2.5)
+        indicator_9.shift(RIGHT*2.5)
         self.play(
             ShowCreation(indicator_circuit[2]),
             ShowCreation(backward_circuit[0]),
@@ -900,8 +1020,8 @@ class SymbolBreakdown(Scene):
             Uncreate(backward_circuit[2]),
             FadeOut(indicator_6),
         )
-        indicator_circuit = doubling_sequence(9,2,1,2)
-        backward_circuit = halving_sequence(9,2)
+        indicator_circuit = doubling_sequence(9,2,1,2).shift(RIGHT*2.5)
+        backward_circuit = halving_sequence(9,2).shift(RIGHT*2.5)
 
         self.wait()
         self.play(
@@ -953,8 +1073,8 @@ class SymbolBreakdown(Scene):
             Uncreate(backward_circuit[5]),
             FadeOut(indicator_3),
         )
-        indicator_circuit = doubling_sequence(9,2,1,2)
-        backward_circuit = halving_sequence(9,2)
+        indicator_circuit = doubling_sequence(9,2,1,2).shift(RIGHT*2.5)
+        backward_circuit = halving_sequence(9,2).shift(RIGHT*2.5)
         self.wait()
         self.play(
             ShowCreation(indicator_circuit[1]),
@@ -972,16 +1092,68 @@ class SymbolBreakdown(Scene):
             FadeOut(indicator_3),
         )
         self.wait()
+
+        pos_green_circs = Group(
+            Circle().set_color(GREEN).scale(0.25).move_to(backward_group[1]),
+            Circle().set_color(GREEN).scale(0.25).move_to(backward_group[3]),
+            Circle().set_color(GREEN).scale(0.25).move_to(backward_group[5]),
+        )
+        pos_red_circs = Group(
+            Circle().set_color(RED).scale(0.25).move_to(double_group[0]),
+            Circle().set_color(RED).scale(0.25).move_to(double_group[2]),
+            Circle().set_color(RED).scale(0.25).move_to(double_group[4]),
+        )
+        pos_blue_circs = Group(
+            Circle().set_color(BLUE).scale(0.25).move_to(half_group[1]),
+            Circle().set_color(BLUE).scale(0.25).move_to(half_group[3]),
+            Circle().set_color(BLUE).scale(0.25).move_to(half_group[5]),
+        )
+
+        neg_green_circs = Group(
+            Circle().set_color(WHITE).scale(0.25).move_to(backward_group[0]),
+            Circle().set_color(WHITE).scale(0.25).move_to(backward_group[2]),
+            Circle().set_color(WHITE).scale(0.25).move_to(backward_group[4]),
+        )
+        neg_red_circs = Group(
+            Circle().set_color(WHITE).scale(0.25).move_to(double_group[1]),
+            Circle().set_color(WHITE).scale(0.25).move_to(double_group[3]),
+            Circle().set_color(WHITE).scale(0.25).move_to(double_group[5]),
+        )
+        neg_blue_circs = Group(
+            Circle().set_color(WHITE).scale(0.25).move_to(half_group[0]),
+            Circle().set_color(WHITE).scale(0.25).move_to(half_group[2]),
+            Circle().set_color(WHITE).scale(0.25).move_to(half_group[4]),
+        )
+
         self.play(
-            FadeOut(half_group),
-            FadeOut(double_group),
-            FadeOut(backward_group),
             FadeOut(left_arrow),
             FadeOut(right_arrow),
-            FadeOut(dashed_3),
-            FadeOut(dashed_6),
-            FadeOut(vert_9),
+            FadeOut(backward_rect),
+            FadeOut(double_rect),
+            FadeOut(half_rect),
         )
+        self.wait()
+        self.play(
+            FadeIn(pos_green_circs),
+            FadeIn(pos_red_circs),
+            FadeIn(pos_blue_circs),
+        )
+        self.wait()
+        self.play(
+            FadeIn(neg_green_circs),
+            FadeIn(neg_red_circs),
+            FadeIn(neg_blue_circs),
+        )
+        # self.play(
+        #     FadeOut(half_group),
+        #     FadeOut(double_group),
+        #     FadeOut(backward_group),
+
+        #     FadeOut(dashed_3),
+        #     FadeOut(dashed_6),
+        #     FadeOut(vert_9),
+        #     FadeOut(backward_rect),
+        # )
 
 class VBMBasic(Scene):
     def construct(self):

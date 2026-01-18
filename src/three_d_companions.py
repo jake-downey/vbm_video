@@ -1,6 +1,7 @@
 from manimlib import *
 import sys
-sys.path.append("C:/Users/thund/Downloads/manim-master/manimprojects")
+import os, sys
+sys.path.insert(0, os.path.dirname(__file__)) 
 from vbm_funcs import *
 from dots_example import *
 
@@ -486,8 +487,8 @@ class DotGridBreakdownCompanion(Scene):
         self.add(circle9)
 
 
-'cool animation'
-LaggedStartMap(FadeIn, circles, lag_ratio=0.02, run_time=2)
+# 'cool animation'
+# LaggedStartMap(FadeIn, circles, lag_ratio=0.02, run_time=2)
 
 
 

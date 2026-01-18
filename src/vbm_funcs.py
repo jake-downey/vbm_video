@@ -5,7 +5,7 @@ non_zero = .001
 def mod_circle(mod, scale, font_scale):
     circle = Circle().scale(scale).set_color(WHITE)
     dot = Dot()
-    r = 1.3
+    r = 1.25
     dot_group = Group()
     number_group = Group()
     total_group = Group()
@@ -58,16 +58,39 @@ def vbm_symbol():
                     np.cos(TAU * (((number * 2) % 9) / 9)),
                     0
                 ],
-            ).set_color(BLUE).set_stroke(width=5)
+            ).set_color(RED).set_stroke(width=5)
             doubling.append(number)
             line_group.add(new_line)
             number = (number * 2) % 9
             test+=1
         else:
             break
-    line_group.shift(LEFT*0.025)
-    new_line_group = line_group.copy()
-    new_line_group.shift(RIGHT*0.05).set_color(RED)
+    new_line_group = Group()
+    halving = []
+    number = 1
+    test = 0
+    while test < 9:
+        if number not in halving:
+            new_line = Line(
+                [
+                    np.sin(TAU * (number / 9)),
+                    np.cos(TAU * (number / 9)),
+                    0
+                ],
+                [
+                    np.sin(TAU * (((number * 5) % 9) / 9)),
+                    np.cos(TAU * (((number * 5) % 9) / 9)),
+                    0
+                ],
+            ).set_color(BLUE).set_stroke(width=5)
+            halving.append(number)
+            new_line_group.add(new_line)
+            number = (number * 5) % 9
+            test+=1
+        else:
+            break
+    line_group.shift(RIGHT*0.025)
+    new_line_group.shift(LEFT*0.025)
     line1 = DashedLine(
         [
             np.sin(TAU * (0/9)),

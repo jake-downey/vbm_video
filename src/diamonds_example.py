@@ -1,6 +1,6 @@
 from manimlib import *
-import sys
-sys.path.append("C:/Users/thund/Downloads/manim-master/manimprojects")
+import os, sys
+sys.path.insert(0, os.path.dirname(__file__)) 
 from diamond_funcs import *
 from vbm_funcs import *
 from dots_example import *
